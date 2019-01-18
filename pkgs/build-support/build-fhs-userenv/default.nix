@@ -1,10 +1,11 @@
 { callPackage, runCommand, writeScript, stdenv, coreutils }:
 
-let buildFHSEnv = callPackage ./env.nix { }; in
-
-args@{ name, runScript ? "bash", extraInstallCommands ? "", meta ? {}, passthru ? {}, ... }:
+args@{ name, runScript ? "$SHELL", extraInstallCommands ? "", meta ? {}, passthru ? {}, preservePath ? true, ... }:
 
 let
+
+  buildFHSEnv = callPackage ./env.nix { inherit preservePath; };
+
   env = buildFHSEnv (removeAttrs args [ "runScript" "extraInstallCommands" "meta" "passthru" ]);
 
   chrootenv = callPackage ./chrootenv {};
