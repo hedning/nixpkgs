@@ -1,9 +1,10 @@
-{ stdenv, buildEnv, writeText, pkgs, pkgsi686Linux, preservePath }:
+{ stdenv, buildEnv, writeText, pkgs, pkgsi686Linux}:
 
 { name, profile ? ""
 , targetPkgs ? pkgs: [], multiPkgs ? pkgs: []
 , extraBuildCommands ? "", extraBuildCommandsMulti ? ""
 , extraOutputsToInstall ? []
+, inheritPath ? true, hostShell ? true
 }:
 
 # HOWTO:
@@ -20,8 +21,7 @@
 # /lib32 will include 32bit libraries from multiPkgs
 # /lib64 will include 64bit libraries from multiPkgs and targetPkgs
 # /lib will link to /lib32
-
-let
+with pkgs.lib; let
   is64Bit = stdenv.hostPlatform.parsed.cpu.bits == 64;
   isMultiBuild  = multiPkgs != null && is64Bit;
   isTargetBuild = !isMultiBuild;
@@ -47,11 +47,11 @@ let
     [ (toString gcc.cc.lib)
     ];
 
-  etcProfile = with pkgs.lib; writeText "profile" ''
+  etcProfile = writeText "profile" ''
     export PS1='${name}-chrootenv:\u@\h:\w\$ '
     export LOCALE_ARCHIVE='/usr/lib/locale/locale-archive'
     export LD_LIBRARY_PATH='/run/opengl-driver/lib:/run/opengl-driver-32/lib:/usr/lib:/usr/lib32'
-    export PATH="/run/wrappers/bin:/usr/bin:/usr/sbin${optionalString preservePath "\${PATH:-:}$PATH"}"
+    export PATH="/run/wrappers/bin:/usr/bin:/usr/sbin${optionalString inheritPath "\${PATH:-:}$PATH"}"
     export TZDIR='/etc/zoneinfo'
 
     # Force compilers and other tools to look in default search paths
@@ -74,7 +74,7 @@ let
       cd $out/etc
 
       # environment variables
-      ln -s ${etcProfile} profile
+      ln -s ${etcProfile} chroot-profile
 
       # compatibility with NixOS
       ln -s /host/etc/static static
@@ -113,7 +113,21 @@ let
 
       # symlink /etc/mtab -> /proc/mounts (compat for old userspace progs)
       ln -s /proc/mounts mtab
-    '';
+    '' + (optionalString hostShell ''
+      # bash
+      ln -s /host/etc/profile profile
+      ln -s /host/etc/bashrc bashrc
+      ln -s /host/etc/inputrc inputrc
+
+      # zsh
+      ln -s /host/etc/zprofile zprofile
+      ln -s /host/etc/zshrc zshrc
+      ln -s /host/etc/zshenv zshenv
+      ln -s /host/etc/zinputrc zinputrc
+
+      # zsh
+      ln -s /host/etc/fish fish
+    '');
   };
 
   # Composes a /usr-like directory structure

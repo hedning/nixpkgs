@@ -1,10 +1,15 @@
 { callPackage, runCommand, writeScript, stdenv, coreutils }:
 
-args@{ name, runScript ? "$SHELL", extraInstallCommands ? "", meta ? {}, passthru ? {}, preservePath ? true, ... }:
+args@{ name, runScript ? if hostShell then "$SHELL" else "bash"
+, extraInstallCommands ? "", meta ? {}, passthru ? {}
+# Don't reset the path, only prepend to it
+, inheritPath ? true
+# Run $SHELL instead of bash, also use the host's regular shell config
+, hostShell ? true, ... }:
 
 let
 
-  buildFHSEnv = callPackage ./env.nix { inherit preservePath; };
+  buildFHSEnv = callPackage ./env.nix {};
 
   env = buildFHSEnv (removeAttrs args [ "runScript" "extraInstallCommands" "meta" "passthru" ]);
 
@@ -20,7 +25,7 @@ let
     [ -d "$1" ] && [ -r "$1" ] && cd "$1"
     shift
 
-    source /etc/profile
+    source /etc/chroot-profile
     exec ${run} "$@"
   '';
 
