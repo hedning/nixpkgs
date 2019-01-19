@@ -28,10 +28,10 @@
 # $ conda-shell
 # $ conda install spyder
 let
-  version = "4.3.31";
+  version = "4.5.12";
   src = fetchurl {
       url = "https://repo.continuum.io/miniconda/Miniconda3-${version}-Linux-x86_64.sh";
-      sha256 = "1rklq81s9v7xz1q0ha99w2sl6kyc5vhk6b21cza0jr3b8cgz0lam";
+      sha256 = "0yhmi6sgrvbzkwdxnxnpb7f42wizfwi44lwmnfb0x3li5b6v9rg5";
   };
 
   conda = runCommand "conda-install" { buildInputs = [ makeWrapper ]; }
@@ -48,7 +48,7 @@ let
     '';
 in
   buildFHSUserEnv {
-    name = "conda-shell-${version}";
+    name = "conda-shell";
     targetPkgs = pkgs: (builtins.concatLists [ [ conda ] condaDeps extraPkgs]);
     profile = ''
       # Add conda to PATH
