@@ -6,11 +6,11 @@
 
 stdenv.mkDerivation rec {
   name = "gedit-${version}";
-  version = "3.30.2";
+  version = "3.31.92";
 
   src = fetchurl {
     url = "mirror://gnome/sources/gedit/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
-    sha256 = "0qwig35hzvjaqic9x92jcpmycnvcybsbnbiw6rppryx0arwb3wza";
+    sha256 = "1sbwxcrqpghfkkkim9idpj13xha5f5j7xysxc07vsd3356vy7gkc";
   };
 
   nativeBuildInputs = [ pkgconfig wrapGAppsHook intltool itstool libxml2 ];
