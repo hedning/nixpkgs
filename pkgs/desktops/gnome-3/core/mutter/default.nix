@@ -6,22 +6,12 @@
 
 stdenv.mkDerivation rec {
   name = "mutter-${version}";
-  version = "3.30.2";
+  version = "3.31.91";
 
   src = fetchurl {
     url = "mirror://gnome/sources/mutter/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
-    sha256 = "0qr3w480p31nbiad49213rj9rk6p9fl82a68pzznpz36p30dq96z";
+    sha256 = "1h448ky43wpgzhwmb7kdkn80n6pvz8mgg9mf0qpwflsm9vfp1nfa";
   };
-
-  patches = [
-    # https://gitlab.gnome.org/GNOME/mutter/issues/270
-    # Fixes direction of the desktop switching animation when using workspace
-    # grid extension with desktops arranged horizontally.
-    (fetchpatch {
-      url = https://gitlab.gnome.org/GNOME/mutter/commit/92cccf53dfe9e077f1d61ac4f896fd391f8cb689.patch;
-      sha256 = "11vmypypjss50xg7hhdbqrxvgqlxx4lnwy59089qsfl3akg4kk2i";
-    })
-  ];
 
   configureFlags = [
     "--with-x"
