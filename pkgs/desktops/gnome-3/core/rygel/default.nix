@@ -2,7 +2,7 @@
 
 let
   pname = "rygel";
-  version = "0.36.2";
+  version = "0.37.2";
 in stdenv.mkDerivation rec {
   name = "${pname}-${version}";
 
@@ -11,7 +11,7 @@ in stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
-    sha256 = "0i12z6bzfzgcjidhxa2jsvpm4hqpab0s032z13jy2vbifrncfcnk";
+    sha256 = "0f4rxri9vqwrz2scir0pjsg4ilqyclypaakr3x7804g6rkln0q40";
   };
 
   nativeBuildInputs = [
