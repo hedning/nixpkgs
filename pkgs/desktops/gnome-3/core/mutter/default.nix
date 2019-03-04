@@ -1,8 +1,12 @@
-{ fetchurl, fetchpatch, stdenv, pkgconfig, gnome3, intltool, gobject-introspection, upower, cairo
+{ fetchurl, fetchpatch, stdenv, pkgconfig, gnome3, gettext, gobject-introspection, upower, cairo
 , pango, cogl, clutter, libstartup_notification, zenity, libcanberra-gtk3
-, libtool, makeWrapper, xkeyboard_config, libxkbfile, libxkbcommon, libXtst, libinput
+, ninja, makeWrapper, xkeyboard_config, libxkbfile, libxkbcommon, libXtst, libinput
 , gsettings-desktop-schemas, glib, gtk3, gnome-desktop
-, geocode-glib, pipewire, libgudev, libwacom, xwayland, autoreconfHook }:
+, geocode-glib, pipewire, libgudev, libwacom, xwayland, meson
+, gnome-settings-daemon
+, xorgserver
+, python3
+}:
 
 stdenv.mkDerivation rec {
   name = "mutter-${version}";
@@ -13,17 +17,8 @@ stdenv.mkDerivation rec {
     sha256 = "1h448ky43wpgzhwmb7kdkn80n6pvz8mgg9mf0qpwflsm9vfp1nfa";
   };
 
-  configureFlags = [
-    "--with-x"
-    "--disable-static"
-    "--enable-remote-desktop"
-    "--enable-shape"
-    "--enable-sm"
-    "--enable-startup-notification"
-    "--enable-xsync"
-    "--enable-verbose-mode"
-    "--with-libcanberra"
-    "--with-xwayland-path=${xwayland}/bin/Xwayland"
+  mesonFlags = [
+    "-Dxwayland-path=${xwayland}/bin/Xwayland"
   ];
 
   propagatedBuildInputs = [
@@ -31,15 +26,29 @@ stdenv.mkDerivation rec {
     libXtst
   ];
 
-  nativeBuildInputs = [ autoreconfHook pkgconfig intltool libtool makeWrapper ];
+  nativeBuildInputs = [
+    meson
+    pkgconfig
+    gettext
+    ninja
+    makeWrapper
+    python3
+    # for cvt command
+    xorgserver
+  ];
 
   buildInputs = [
     glib gobject-introspection gtk3 gsettings-desktop-schemas upower
     gnome-desktop cairo pango cogl clutter zenity libstartup_notification
     geocode-glib libinput libgudev libwacom
     libcanberra-gtk3 zenity xkeyboard_config libxkbfile
-    libxkbcommon pipewire
+    libxkbcommon pipewire xwayland
+    gnome-settings-daemon
   ];
+
+  postPatch = ''
+    patchShebangs src/backends/native/gen-default-modes.py
+  '';
 
   preFixup = ''
     wrapProgram "$out/bin/mutter" \
