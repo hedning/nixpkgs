@@ -1,22 +1,38 @@
-{ stdenv, fetchurl, pkgconfig, gobject-introspection, vala, gtk-doc, docbook_xsl, docbook_xml_dtd_412, libsoup, gtk3, glib }:
+{ stdenv
+, meson
+, ninja
+, fetchurl
+, pkgconfig
+, gobject-introspection
+, vala
+, gtk-doc
+, docbook_xsl
+, docbook_xml_dtd_412
+, libsoup
+, gtk3
+, glib }:
 
 stdenv.mkDerivation rec {
   name = "gssdp-${version}";
-  version = "1.0.2";
+  version = "1.1.3";
 
   outputs = [ "out" "bin" "dev" "devdoc" ];
 
   src = fetchurl {
     url = "mirror://gnome/sources/gssdp/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
-    sha256 = "1p1m2m3ndzr2whipqw4vfb6s6ia0g7rnzzc4pnq8b8g1qw4prqd1";
+    sha256 = "1x9cvadnvwb7zlzsa1xlj0vpnk7cbnzvgpa9xp06bws99xw5sly9";
   };
 
-  nativeBuildInputs = [ pkgconfig gobject-introspection vala gtk-doc docbook_xsl docbook_xml_dtd_412 ];
+  nativeBuildInputs = [
+    meson ninja
+    pkgconfig gobject-introspection vala gtk-doc docbook_xsl
+    docbook_xml_dtd_412
+  ];
   buildInputs = [ libsoup gtk3 ];
   propagatedBuildInputs = [ glib ];
 
-  configureFlags = [
-    "--enable-gtk-doc"
+  mesonFlags = [
+    "-Dgtk_doc=true"
   ];
 
   doCheck = true;
