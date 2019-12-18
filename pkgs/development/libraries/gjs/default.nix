@@ -1,11 +1,13 @@
 { fetchurl
 , stdenv
+, meson
+, ninja
 , pkgconfig
 , gnome3
 , gtk3
 , atk
 , gobject-introspection
-, spidermonkey_60
+, spidermonkey_68
 , pango
 , cairo
 , readline
@@ -15,20 +17,23 @@
 , gdk-pixbuf
 , makeWrapper
 , nixosTests
+, fetchpatch
 }:
 
 stdenv.mkDerivation rec {
   pname = "gjs";
-  version = "1.58.4";
+  version = "1.63.92";
 
   src = fetchurl {
     url = "mirror://gnome/sources/gjs/${stdenv.lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
-    sha256 = "0pxxgsb9gvymgr7qsglfdbaa7hy29y01prszjr27f7bpdik3y6i6";
+    sha256 = "11w5g7s4654m5cm29m11s2cmcpa602j6ihhjp0r80fxf3g6l51vd";
   };
 
   outputs = [ "out" "dev" "installedTests" ];
 
   nativeBuildInputs = [
+    meson
+    ninja
     pkgconfig
     makeWrapper
     libxml2 # for xml-stripblanks
@@ -38,7 +43,7 @@ stdenv.mkDerivation rec {
     gobject-introspection
     cairo
     readline
-    spidermonkey_60
+    spidermonkey_68
     dbus # for dbus-run-session
   ];
 
@@ -46,9 +51,31 @@ stdenv.mkDerivation rec {
     glib
   ];
 
-  configureFlags = [
-    "--enable-installed-tests"
+  mesonFlags = [
+    "-Dprofiler=disabled"
   ];
+
+  patches = [
+    (fetchpatch {
+      # https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/396
+      url = "https://gitlab.gnome.org/GNOME/gjs/-/commit/76739db6803ed01d6ef31de6aaaf3689d31c2c9e.patch";
+      sha256 = "1jakil88qvnlwrxfjg96fqq9kl0kzqj7k3x7argfpmhj6lsggfhy";
+    })
+    (fetchpatch {
+      # https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/396
+      url = "https://gitlab.gnome.org/GNOME/gjs/-/commit/f4b3fc00e681c472a5dc7c962a13317e355dc5ea.patch";
+      sha256 = "0vdfqyz5g8byp3x65ymi7l49m5ip6czbddnp97rj6s7ax3gj307n";
+    })
+    (fetchpatch {
+      # https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/396
+      url = "https://gitlab.gnome.org/GNOME/gjs/-/commit/b77830b36efc2b837681dc9f5053136c77282ba8.patch";
+      sha256 = "1yhl4yxm5yrdljnp4w93nhij5fasv5l47glklj722x463z9mjziq";
+    })
+  ];
+
+  # configureFlags = [
+  #   "--enable-installed-tests"
+  # ];
 
   postPatch = ''
     for f in installed-tests/*.test.in; do
