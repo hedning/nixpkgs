@@ -17,7 +17,6 @@
 , gdk-pixbuf
 , makeWrapper
 , nixosTests
-, fetchpatch
 }:
 
 stdenv.mkDerivation rec {
@@ -53,24 +52,6 @@ stdenv.mkDerivation rec {
 
   mesonFlags = [
     "-Dprofiler=disabled"
-  ];
-
-  patches = [
-    (fetchpatch {
-      # https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/396
-      url = "https://gitlab.gnome.org/GNOME/gjs/-/commit/76739db6803ed01d6ef31de6aaaf3689d31c2c9e.patch";
-      sha256 = "1jakil88qvnlwrxfjg96fqq9kl0kzqj7k3x7argfpmhj6lsggfhy";
-    })
-    (fetchpatch {
-      # https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/396
-      url = "https://gitlab.gnome.org/GNOME/gjs/-/commit/f4b3fc00e681c472a5dc7c962a13317e355dc5ea.patch";
-      sha256 = "0vdfqyz5g8byp3x65ymi7l49m5ip6czbddnp97rj6s7ax3gj307n";
-    })
-    (fetchpatch {
-      # https://gitlab.gnome.org/GNOME/gjs/-/merge_requests/396
-      url = "https://gitlab.gnome.org/GNOME/gjs/-/commit/b77830b36efc2b837681dc9f5053136c77282ba8.patch";
-      sha256 = "1yhl4yxm5yrdljnp4w93nhij5fasv5l47glklj722x463z9mjziq";
-    })
   ];
 
   # configureFlags = [
